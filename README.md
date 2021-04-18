@@ -6,6 +6,7 @@ Ruby gem to support INTERLNK/INTERSVR communications.
 Ruby class/gem to handle INTERLNK/INTERSVR communications, to communicate with DOS machines.
 
 ## Features
+ * Supports client-side communications (emulates INTERLNK)
  * Supports serial channel type over TCP transport (for use with e.g. VirtualBox serial ports)
  * Able to read lists of available drives, names and specifications of the drives
  * Provides an IO-compatible object to perform IO against
@@ -15,6 +16,7 @@ Ruby class/gem to handle INTERLNK/INTERSVR communications, to communicate with D
  * Actual serial port support
  * Parallel port support
  * Support baud rates other than 115200
+ * Support server-side communications (emulate INTERSVR)
  * More graceful error handling, should retry rather than giving up in many places
 
 
