@@ -6,10 +6,10 @@ Ruby gem to support INTERLNK/INTERSVR communications.
 Ruby class/gem to handle INTERLNK/INTERSVR communications, to communicate with DOS machines.
 
 ## Features
- * Supports serial channel type over TCP transport
+ * Supports serial channel type over TCP transport (for use with e.g. VirtualBox serial ports)
  * Able to read lists of available drives, names and specifications of the drives
- * Provides a ruby IO-compatible object and can perform general block I/O using it
- * Block I/O layer has basic caching functionality to avoid transfering data over slow links as much as possible
+ * Provides an IO-compatible object to perform IO against
+ * Basic caching functionality to avoid transfering data over slow links as much as possible
 
 ## TODO
  * Actual serial port support
