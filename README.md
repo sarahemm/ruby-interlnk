@@ -23,10 +23,15 @@ Ruby class/gem to handle INTERLNK/INTERSVR communications, to communicate with D
 ## Use
     require 'interlnk'
     
-    interlnk = Interlnk::Client.new(host: 'localhost', port: 5000)
-    drives = @interlnk.drives
+    # connect to INTERSVR over a TCP serial port (e.g. to VirtualBox)
+    interlnk = Interlnk::Client.new(
+      transport: Interlnk::Transport::Tcp,
+      channel: Interlnk::Channel::Serial,
+      connection_info: {host: 'localhost', port: 5000}
+    )
+    drives = interlnk.drives
     p drives
-    interio = @drives['C'].interio
+    interio = drives['C'].interio
     # can now use interio just like you would a file, likely hooking it up to a FAT library
 
 

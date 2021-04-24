@@ -6,9 +6,8 @@ module Interlnk
   class Protocol
     attr_reader :server_info, :init_info
 
-    def initialize(host: nil, port: nil)
-      # TODO: support different types
-      @channel = TcpSerialChannel.new(host: host, port:port)
+    def initialize(channel:)
+      @channel = channel
       @channel.connect
       @channel.baud = 115200
       @server_info = get_server_info

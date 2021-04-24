@@ -43,9 +43,10 @@ module Interlnk
       end
     end
 
-    def initialize(host: nil, port: nil)
-      # TODO: support other channel types
-      @protocol = Protocol.new(host: host, port: port)
+    def initialize(transport:, channel:, connection_info: nil)
+      @transport = transport.new(connection_info: connection_info)
+      @channel = channel.new(transport: @transport)
+      @protocol = Protocol.new(channel: @channel)
     end
 
     def drives
