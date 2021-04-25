@@ -6,11 +6,7 @@ module Interlnk
   class Transport
     class Tcp      
       def initialize(connection_info:)
-        @debug = false
         @sock = TCPSocket.new connection_info[:host], connection_info[:port]
-        @next_seqnbr = 0
-    
-        @next_needs_seqflags = true
       end
 
       def baud=(new_baud)
