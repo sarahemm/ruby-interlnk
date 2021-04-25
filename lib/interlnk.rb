@@ -7,6 +7,7 @@ require 'interlnk/packet/io.rb'
 
 require 'interlnk/channel/serial.rb'
 require 'interlnk/transport/tcp.rb'
+require 'interlnk/transport/serialport.rb'
 
 require 'interlnk/crc.rb'
 require 'interlnk/protocol.rb'
