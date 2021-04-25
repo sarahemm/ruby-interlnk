@@ -28,7 +28,6 @@ module Interlnk
 
       def initialize(transport:)
         @transport = transport
-        @sock = transport.sock
         @debug = false
         @next_seqnbr = 0
     
@@ -74,7 +73,7 @@ module Interlnk
         # TODO: support 'word-length' packets, not just 'byte-length'
         printf "SL> 0x%02X\n", data.length if @debug
         crc << data.length
-        @sock.write [data.length].pack('C')
+        @transport.write [data.length].pack('C')
     
         # send the packet data itself
         print "SD> " if @debug
@@ -83,13 +82,13 @@ module Interlnk
           crc << datum
         end
         print "\n" if @debug
-        @sock.write data.pack('C*')
+        @transport.write data.pack('C*')
     
         # send the CRC
         crc_low = crc.result & 0x00FF
         crc_high = (crc.result & 0xFF00) >> 8
         printf "SC> 0x%02X 0x%02X\n", crc_high, crc_low if @debug
-        @sock.write [crc_high, crc_low].pack('CC')
+        @transport.write [crc_high, crc_low].pack('CC')
         
         if(seq_flags) then
           expect(seq_flags)
@@ -118,13 +117,13 @@ module Interlnk
         ack = (@last_seq_flags & 0xFC) | this_seqnbr
         send ack
     
-        what = @sock.read(1).unpack('C')[0] # TODO: validate this, don't just ignore it
+        what = @transport.read(1).unpack('C')[0] # TODO: validate this, don't just ignore it
         printf "CT< 0x%02X\n", what if @debug
         @last_seq_flags = ack
       end
     
       def receive_packet(type: nil)
-        packet_length = @sock.read(1).unpack('C')[0]
+        packet_length = @transport.read(1).unpack('C')[0]
         packet_length_bytes = [packet_length]
         length_type = :byte
         if(packet_length == 0) then
@@ -132,13 +131,13 @@ module Interlnk
           # TODO: first length byte of 00 isn't the right way
           #       to identify this, but it works for now
           length_type = :word
-          packet_length_msb = @sock.read(1).unpack('C')[0]
+          packet_length_msb = @transport.read(1).unpack('C')[0]
           packet_length_bytes << packet_length_msb
           packet_length = packet_length | (packet_length_msb << 8)
         end
         puts "\nReceiving #{packet_length} byte packet." if @debug
         printf "RL< 0x%02X\n", packet_length if @debug
-        packet_data = @sock.read(packet_length+2)
+        packet_data = @transport.read(packet_length+2)
         crc = Crc.new()
         packet_length_bytes.each { |byte| crc << byte }
         print "RD< " if @debug
@@ -180,13 +179,6 @@ module Interlnk
       end
 
       #private
-
-      def drain
-        print "Drained: "
-        data = @sock.readpartial(255).unpack('C*')
-        data.each {|byte| printf('0x%02X ', byte)}
-        print "\n"
-      end
 
       def calculate_ack_for(input)
         # this is weird but it's just how ack bytes work for seq/flags
@@ -230,11 +222,11 @@ module Interlnk
     
       def send(send)
         puts "SE> 0x#{send.to_s(16).rjust(2, '0')} (seq bits #{(send & 0x03).to_s(2).rjust(2, '0')})" if @debug
-        @sock.write [send].pack('C')
+        @transport.write [send].pack('C')
       end
     
       def expect(expect)
-        response = @sock.read(1).unpack('C')[0]
+        response = @transport.read(1).unpack('C')[0]
         puts "SE< 0x#{response.to_s(16).rjust(2, '0')} (seq bits #{(response & 0x03).to_s(2).rjust(2, '0')})" if @debug
         if(response != expect) then
           raise ProtocolException, "Expected 0x#{expect.to_s(16).rjust(2, '0')}, got 0x#{response.to_s(16).rjust(2, '0')}"
